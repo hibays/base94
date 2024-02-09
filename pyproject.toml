@@ -1,0 +1,31 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "base94"
+authors = [
+    {name = "hibays", email = "hibays@github.com"},
+]
+description = "A package allows you to en/decode using base94."
+keywords = ["Codec", "Rust", "Base", "Base94"]
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+]
+dynamic = ["version"]
+
+[project.urls]
+documentation = "https://readthedocs.org"
+repository = "https://github.com/hibays/base94.git"
+
+[project.optional-dependencies]
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
