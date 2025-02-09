@@ -1,4 +1,4 @@
-﻿# Base 94 encode/decode for Python 3
+﻿# Implementation of Base94 encode and decode in Python 3.
 #
 # THE GPLv3 LICENSE
 # Copyleft (©) 2022 hibays
@@ -34,7 +34,7 @@ def b94encode(data,
 	bnjoin=b''.join,
 	from_bytes=int.from_bytes,
 	b94tab=[bytes((i,)) for i in _b94alphabet] # The type of (b'ABC')[0] is int. This makes it from int to bytes.
-	) :
+	) -> bytes :
 	'''Input bytes-like object, return bytes.
 	This algorithm transform 9 bytes to 11 bytes
 	The encoded data is about 22.2% larger.
@@ -80,7 +80,7 @@ def b94decode(data,
 	bnjoin = b''.join,
 	_intto_byte = int.to_bytes,
 	b94nums = {j: i for i,j in enumerate(_b94alphabet)} # dict faster
-	) :
+	) -> bytes :
 	'''This function decodes the data that has been encoded by base94.
 	Input bytes-like object, return bytes.
 	'''
@@ -124,7 +124,7 @@ if __name__ == '__main__' :
 		return '%f%s' % (size, pint[depth])
 		
 	try :
-		from base91 import encode as b91encode, decode as b91decode
+		from base91 import encode as b91encode, decode as b91decode # type: ignore
 	except :
 		b91decode = b91encode = lambda _ : str(print('(No Base91 Modular)', end=''))
 
