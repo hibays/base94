@@ -5,12 +5,12 @@
 // Copyleft (©) 2025 hibays
 //
 
-use pyo3::prelude::*;
 use lazy_static::lazy_static;
+use pyo3::prelude::*;
 
 lazy_static! {
     // Base94 字母表（与 Python 实现完全一致）
-    static ref B94_ENCODE_TAB: Vec<u8> = vec![
+    static ref B94_ENCODE_TAB: [u8; 94] = [
         b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M',
         b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z',
         b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm',
@@ -31,11 +31,13 @@ lazy_static! {
     };
 
     // 预生成双字符编码表（94x94 组合）
-    static ref B94_ENCODE_TAB2: Vec<[u8; 2]> = {
-        let mut tab = Vec::with_capacity(94*94);
+    static ref B94_ENCODE_TAB2: [[u8; 2]; 94*94] = {
+        let mut tab: [[u8; 2]; 94*94] = [[0; 2]; 94*94];
+        let mut index = 0;
         for &c1 in B94_ENCODE_TAB.iter() {
             for &c2 in B94_ENCODE_TAB.iter() {
-                tab.push([c1, c2]);
+                tab[index] = [c1, c2];
+                index += 1;
             }
         }
         tab

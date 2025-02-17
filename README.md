@@ -1,11 +1,11 @@
 # base94 🚀
 
-基于PyO3的高性能Base94编码/解码Rust实现，比原生Python版本快10-40倍。
+基于PyO3的高性能Base94编码/解码Rust实现，比原生Python版本快14-40倍。
 
 ## 特性
 
 - ⚡ **极速处理**：使用Rust优化核心算法
-- 🔄 **无缝兼容**：完美匹配原Python版本的输入输出
+- 🔄 **无缝兼容**：完美兼容纯Python版本
 - 🛡️ **内存安全**：零拷贝操作与预分配缓冲区
 - 📦 **简单API**：`b94encode`/`b94decode` 两个直观函数
 
@@ -13,21 +13,30 @@
 
 ### 前置要求
 
-- Rust工具链 (1.54+)
+- Rust工具链 (1.74+)
 - Python 3.8+
 - maturin (`pip install maturin`)
 
 ### 安装步骤
 
+## pip 安装
+
+```bash
+# 安装稳定版本
+pip install 'base94-rs'
+
+# 安装测试版本
+pip install git+https://github.com/hibays/base94.git
+```
+
+## 从源码编译
+
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/base94.git
+git clone https://github.com/hibays/base94.git
 cd base94
 
 # 编译安装
-maturin develop --release
-
-# 打包安装
 pip install .
 ```
 
@@ -50,14 +59,14 @@ print(f"Decoded: {decoded}")  # b'Hello Base94!'
 
 | 数据大小 | 实现版本         | 编码时间 (s) | 解码时间 (s) | 编码速度   | 解码速度   |
 |----------|------------------|--------------|--------------|------------|------------|
-| 10KB     | Python Native    |       0.0095 |       0.0073 | 1.02 MB/s  | 1.34 MB/s  |
-| 10KB     | Rust Accelerated |       0.0004 |       0.0001 | 26.33 MB/s | 65.94 MB/s |
-| 100KB    | Python Native    |       0.0600 |       0.0803 | 1.63 MB/s  | 1.22 MB/s  |
-| 100KB    | Rust Accelerated |       0.0037 |       0.0013 | 26.17 MB/s | 72.56 MB/s |
-| 1MB      | Python Native    |       0.5844 |       0.8262 | 1.71 MB/s  | 1.21 MB/s  |
-| 1MB      | Rust Accelerated |       0.0428 |       0.0220 | 23.36 MB/s | 45.36 MB/s |
-| 10MB     | Python Native    |       5.9944 |       8.4735 | 1.67 MB/s  | 1.18 MB/s  |
-| 10MB     | Rust Accelerated |       0.4223 |       0.2170 | 23.68 MB/s | 46.07 MB/s |
+| 10KB     | Python Native    |       0.0088 |       0.0067 | 1.11 MB/s  | 1.45 MB/s  |
+| 10KB     | Rust Accelerated |       0.0003 |       0.0001 | 31.75 MB/s | 70.26 MB/s |
+| 100KB    | Python Native    |       0.0523 |       0.0704 | 1.87 MB/s  | 1.39 MB/s  |
+| 100KB    | Rust Accelerated |       0.0035 |       0.0014 | 28.13 MB/s | 72.17 MB/s |
+| 1MB      | Python Native    |       0.5254 |       0.7434 | 1.90 MB/s  | 1.35 MB/s  |
+| 1MB      | Rust Accelerated |       0.0388 |       0.0220 | 25.79 MB/s | 45.54 MB/s |
+| 10MB     | Python Native    |       5.5060 |       7.6613 | 1.82 MB/s  | 1.31 MB/s  |
+| 10MB     | Rust Accelerated |       0.3819 |       0.2030 | 26.19 MB/s | 49.27 MB/s |
 
 > 测试环境：i7-13620H @ 2.4GHz, 32GB DDR5 RAM
 
@@ -74,26 +83,73 @@ print(f"Decoded: {decoded}")  # b'Hello Base94!'
 
 ```mermaid
 graph TD
+    %% 编码流程开始
     A[输入字节流] --> B{填充处理}
     B -->|补零| C[分块处理 9bytes/chunk]
     C --> D[转换为128位整数]
     D --> E[基数94分解]
     E --> F[查表编码]
     F --> G[输出Base94字符串]
+
+    %% Python Binding 部分
+    H[Python调用b94encode] --> I{自动选择实现}
+    I -->|Python Native| J[py_b94encode]
+    I -->|Rust Accelerated| K[rs_b94encode]
+
+    %% 编码算法及加速细节
+    L[查找表预计算] --> M[SIMD内存布局]
+    M --> N[块级并行]
+    N --> O[零堆分配]
+    O --> G
+
+    %% 编码最终结果
+    G --> P[编码最终结果]
+
+    %% 解码流程开始
+    Q[输入Base94字符串] --> R{填充处理}
+    R -->|补零| S[分块处理 11bytes/chunk]
+    S --> T[Base94字符映射]
+    T --> U[组合成9字节]
+    U --> V[输出解码字节流]
+
+    %% Python Binding 部分
+    W[Python调用b94decode] --> X{自动选择实现}
+    X -->|Python Native| Y[py_b94decode]
+    X -->|Rust Accelerated| Z[rs_b94decode]
+
+    %% 解码算法及加速细节
+    AA[查找表预计算] --> BB[SIMD内存布局]
+    BB --> CC[块级并行]
+    CC --> DD[零堆分配]
+    DD --> V
+
+    %% 解码最终结果
+    V --> EE[解码最终结果]
 ```
-
-## 注意事项
-
-1. 输入数据类型应为`bytes`或支持buffer协议的对象
-2. 编码填充使用`\x00`，解码填充使用`~`字符
-3. 非法字符解码会引发`ValueError`
-4. 最大支持编码2^72个不同数据块
 
 ## 基准测试
 
 ```bash
+# 运行单元测试
+python -m pytest
+
 # 运行性能测试
-python benchmarks/performance_test.py
+python -m python.benchmarks
+```
+
+## 本地开发
+
+> 建议使用`uv`管理虚拟环境
+
+```bash
+# 创建虚拟环境
+uv venv
+# 安装依赖
+uv pip install maturin twine
+# 打包发布
+uv build && twine upload dist/*
+# 本地测试性安装
+maturin develop --release
 ```
 
 ## 贡献指南

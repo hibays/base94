@@ -3,7 +3,7 @@ requires = ["maturin>=1.8,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "base94"
+name = "base94-rs"
 authors = [
     {name = "hibays", email = "hibays@github.com"},
 ]
@@ -22,7 +22,6 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-documentation = "https://readthedocs.org"
 repository = "https://github.com/hibays/base94.git"
 
 [project.optional-dependencies]
